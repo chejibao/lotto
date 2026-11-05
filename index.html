@@ -279,20 +279,23 @@ function tabs(){
   ORDER.forEach(function(k){
     var b=document.createElement('button');b.className='tab'+(isToday(k)?' td':'');b.setAttribute('aria-pressed',k===cur);b.style.setProperty('--a',TH[k][0]);b.style.setProperty('--b',TH[k][1]);
     b.textContent=G[k].n;
-    b.onclick=function(){cur=k;rows=[];tabs();info();grids();mineInit();showMine();render()};
+    b.onclick=function(){cur=k;rows=RES[k]||[];tabs();info();grids();mineInit();showMine();render()};
     t.appendChild(b)})}
 function info(){applyTheme(cur);$('rule').textContent=G[cur].rule+'。开奖：'+days(cur);$('kRow').hidden=!G[cur].k;$('kv').textContent=kk;$('nv').textContent=cnt}
 document.addEventListener('click',function(e){
   var n=e.target.getAttribute&&e.target.getAttribute('data-n'),k=e.target.getAttribute&&e.target.getAttribute('data-k');
   if(n){cnt=Math.max(1,Math.min(20,cnt+ +n));info()}
   if(k){kk=Math.max(1,Math.min(10,kk+ +k));info()}});
-$('go').onclick=function(){var r=[];try{for(var i=0;i<cnt;i++)r.push(one())}catch(e){toast(e.message);return}rows=r;render()};
-$('clr').onclick=function(){rows=[];render()};
+$('go').onclick=function(){var r=[];try{for(var i=0;i<cnt;i++)r.push(one())}catch(e){toast(e.message);return}rows=r;RES[cur]=r;saveR();render()};
+$('clr').onclick=function(){rows=[];RES[cur]=[];saveR();render()};
 $('copy').onclick=function(){
   if(!rows.length){toast('还没有号码');return}
   var s=G[cur].n+'\n'+rows.map(function(t,i){return(i+1)+'. '+txt(t)}).join('\n');
   function fb(){var a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('已复制')}catch(e){toast('复制失败，请手动选取')}document.body.removeChild(a)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(function(){toast('已复制')},fb);else fb()};
+function loadR(){try{var o=JSON.parse(localStorage.getItem('lotto-res')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}}
+function saveR(){try{localStorage.setItem('lotto-res',JSON.stringify(RES))}catch(e){}}
+var RES=loadR();
 function loadS(){try{var o=JSON.parse(localStorage.getItem('lotto-sel')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}}
 function saveS(){try{localStorage.setItem('lotto-sel',JSON.stringify(sel))}catch(e){}}
 var mode=1,sel=loadS(),LBL={ssq:['红球','蓝球'],dlt:['前区','后区']};
@@ -349,7 +352,7 @@ function addManual(){var g=G[cur],t=[];
   t.push({t:p.t,d:p.d,v:p.q?a.sort(function(x,y){return x-y}):a})}
  g.p.forEach(function(p,i){$('mi'+i).value=''});addMine(t)}
 $('mAdd').onclick=addManual;
-cur=pickDefault();tabs();info();grids();setMode(1);mineInit();showMine();
+cur=pickDefault();rows=RES[cur]||[];render();tabs();info();grids();setMode(1);mineInit();showMine();
 </script>
 </body>
 </html>
