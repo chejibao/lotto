@@ -293,20 +293,22 @@ $('copy').onclick=function(){
   var s=G[cur].n+'\n'+rows.map(function(t,i){return(i+1)+'. '+txt(t)}).join('\n');
   function fb(){var a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('已复制')}catch(e){toast('复制失败，请手动选取')}document.body.removeChild(a)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(function(){toast('已复制')},fb);else fb()};
-var mode=1,sel={},LBL={ssq:['红球','蓝球'],dlt:['前区','后区']};
+function loadS(){try{var o=JSON.parse(localStorage.getItem('lotto-sel')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}}
+function saveS(){try{localStorage.setItem('lotto-sel',JSON.stringify(sel))}catch(e){}}
+var mode=1,sel=loadS(),LBL={ssq:['红球','蓝球'],dlt:['前区','后区']};
 function slots(){var g=G[cur],o=[],n=0;g.p.forEach(function(p,i){if(p.q)o.push({l:(LBL[cur]||[])[i]||'号码',a:p.a,z:p.z,d:p.d,t:p.t});else for(var j=0;j<p.c;j++)o.push({l:'第 '+(++n)+' 位',a:p.a,z:p.z,d:1,t:p.t})});return o}
 function grids(){
- var S=slots();if(!sel[cur])sel[cur]=S.map(function(){return{}});
+ var S=slots();if(!sel[cur]||sel[cur].length!==S.length)sel[cur]=S.map(function(){return{}});
  var el=$('grids');el.innerHTML='';
  S.forEach(function(s,i){var w=document.createElement('div'),h=document.createElement('div'),gr=document.createElement('div');
   h.className='gl';h.textContent=s.l;gr.className='gr';w.appendChild(h);
   for(var v=s.a;v<=s.z;v++)(function(v){var b=document.createElement('button'),st=sel[cur][i][v]||0;
    b.className='nb'+(st===1?' dan':st===2?' kill':'')+(s.t==='u'?' u':'');b.textContent=pad(v,s.d);
-   b.onclick=function(){var o=sel[cur][i];if(o[v]===mode)delete o[v];else o[v]=mode;grids()};gr.appendChild(b)})(v);
+   b.onclick=function(){var o=sel[cur][i];if(o[v]===mode)delete o[v];else o[v]=mode;saveS();grids()};gr.appendChild(b)})(v);
   w.appendChild(gr);el.appendChild(w)})}
 function setMode(m){mode=m;$('mDan').setAttribute('aria-pressed',m===1);$('mKill').setAttribute('aria-pressed',m===2)}
 $('mDan').onclick=function(){setMode(1)};$('mKill').onclick=function(){setMode(2)};
-$('mClr').onclick=function(){delete sel[cur];grids()};
+$('mClr').onclick=function(){delete sel[cur];saveS();grids()};
 var WD=['日','一','二','三','四','五','六'],ALL=[0,1,2,3,4,5,6];
 var SCH={ssq:{d:[2,4,0],t:'21:15'},dlt:{d:[1,3,6],t:'20:30'},kl8:{d:ALL,t:'21:30'},qlc:{d:[1,3,5],t:'21:15'},d3:{d:ALL,t:'21:15'},p3:{d:ALL,t:'20:30'},p5:{d:ALL,t:'20:30'},qxc:{d:[2,5,0],t:'20:30'}};
 function days(k){var s=SCH[k];if(s.d.length===7)return'每天';return'周'+[1,2,3,4,5,6,0].filter(function(x){return s.d.indexOf(x)>=0}).map(function(x){return WD[x]}).join('、')}
