@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>机选号码</title>
+<style>
+:root{--bg:#eef1f5;--card:#fff;--fg:#1b2230;--mut:#6b7587;--bd:#d9dee7;--red:#d62839;--blue:#2759d8;--acc:#d62839;--accfg:#fff;color-scheme:light;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10141b;--card:#1a212c;--fg:#e8ecf3;--mut:#8f9ab0;--bd:#2c3646;--red:#ef4a5a;--blue:#5b8cff;--acc:#ef4a5a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#10141b;--card:#1a212c;--fg:#e8ecf3;--mut:#8f9ab0;--bd:#2c3646;--red:#ef4a5a;--blue:#5b8cff;--acc:#ef4a5a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 -apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif}
+main{max-width:560px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:22px;margin:6px 0 2px;letter-spacing:.02em}
+.sub{color:var(--mut);font-size:13px;margin:0 0 14px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tab{border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:999px;padding:7px 13px;font-size:14px;cursor:pointer}
+.tab small{color:var(--mut);margin-left:4px;font-size:11px}
+.tab[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--accfg)}
+.tab[aria-pressed="true"] small{color:inherit;opacity:.85}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.rule{font-size:13px;color:var(--mut);margin:0 0 12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
+.step{display:flex;align-items:center;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.step button{width:40px;height:38px;border:0;background:transparent;color:var(--fg);font-size:20px;cursor:pointer}
+.step output{min-width:34px;text-align:center;font-weight:600}
+.go{width:100%;margin-top:12px;border:0;border-radius:12px;background:var(--acc);color:var(--accfg);font-size:18px;font-weight:700;padding:13px;cursor:pointer}
+.go:active{transform:scale(.98)}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.ticket{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:10px 0;border-top:1px dashed var(--bd)}
+.ticket:first-child{border-top:0}
+.idx{width:22px;color:var(--mut);font-size:12px}
+.b{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;
+background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.45),transparent 45%),var(--c);box-shadow:inset 0 -3px 5px rgba(0,0,0,.22);animation:pop .35s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(var(--i)*45ms)}
+.b.r{--c:var(--red)}.b.u{--c:var(--blue)}
+.plus{color:var(--mut);margin:0 2px}
+@keyframes pop{from{transform:scale(.2) translateY(-10px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.b{animation:none}}
+.tools{display:flex;gap:8px;margin-top:10px}
+.tools button{flex:1;border:1px solid var(--bd);background:transparent;color:var(--fg);border-radius:10px;padding:9px;font-size:14px;cursor:pointer}
+.empty{color:var(--mut);text-align:center;padding:18px 0;font-size:14px}
+h2{font-size:15px;margin:22px 0 8px}
+.h{font-size:13px;color:var(--mut);padding:8px 0;border-top:1px dashed var(--bd);word-break:break-all}
+.h b{color:var(--fg)}
+.note{font-size:12px;color:var(--mut);margin-top:20px;line-height:1.6}
+details.dk{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;margin-top:10px}
+details.dk summary{cursor:pointer;font-size:14px;font-weight:600}
+.gl{font-size:13px;color:var(--mut);margin:10px 0 4px}
+.gr{display:flex;flex-wrap:wrap;gap:5px}
+.nb{width:34px;height:34px;padding:0;border:1px solid var(--bd);border-radius:8px;background:transparent;color:var(--fg);font-size:13px;cursor:pointer}
+.nb.dan{background:var(--red);border-color:var(--red);color:#fff}
+.nb.kill{background:var(--mut);border-color:var(--mut);color:var(--bg);text-decoration:line-through}
+.ci{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:14px}
+.ci input{flex:1;min-width:0;border:1px solid var(--bd);border-radius:8px;background:transparent;color:var(--fg);padding:8px 10px;font-size:15px}
+.b.hit{outline:3px solid #f5b400;outline-offset:2px}
+.h.win{color:var(--fg);font-weight:600}
+.tab{text-align:center;line-height:1.3}
+#tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#tabs .tab{padding:5px 4px;font-size:13px;border-radius:10px;box-shadow:none}
+#tabs .tab small{margin-left:3px;font-size:10px}
+#tabs .tab .sd{display:block;margin:1px 0 0;font-size:10.5px;color:var(--mut)}
+#tabs .tab[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+#tabs .tab[aria-pressed="true"] small{color:inherit;opacity:.8}
+#tabs .tab.td{background:var(--red);border-color:var(--red);color:#fff}
+#tabs .tab.td small,#tabs .tab.td .sd{color:#fff;opacity:.92}
+#tabs .tab.td[aria-pressed="true"]{outline:3px solid var(--fg);outline-offset:1px}
+.tab .sd{display:block;margin:2px 0 0;font-size:11px;color:var(--mut)}
+.tab.td{border-color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}
+.today{background:var(--card);border:1px solid var(--bd);border-left:4px solid var(--red);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;line-height:1.6}
+.today b{color:var(--red)}
+[hidden]{display:none!important}
+.mini{margin-left:auto;border:1px solid var(--bd);background:transparent;color:var(--fg);border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+html{background:linear-gradient(180deg,#dc3148,#b3122a) top/100% 150px no-repeat,var(--bg)}
+body{background:transparent}
+main{padding-top:14px}
+h1{color:#fff;font-size:27px;font-weight:800;letter-spacing:.06em;margin:8px 0 2px}
+.sub{color:rgba(255,255,255,.88);margin-bottom:18px}
+.panel,.today{border:0;border-radius:18px;box-shadow:0 6px 20px rgba(20,30,60,.10)}
+.panel{padding:16px}
+details.dk{border:1px solid var(--bd);border-radius:14px;background:rgba(120,130,150,.07)}
+.today{border-left:0;position:relative;padding-left:18px}
+.today::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:4px;background:var(--red)}
+#tabs .tab{border:0;border-radius:12px;padding:7px 4px;box-shadow:0 2px 8px rgba(20,30,60,.10)}
+.go{background:linear-gradient(135deg,#e5384a,#b3122a);border-radius:14px;box-shadow:0 8px 18px rgba(179,18,42,.35);letter-spacing:.2em;font-size:19px;padding:15px}
+.go:active{transform:translateY(1px) scale(.99);box-shadow:0 3px 8px rgba(179,18,42,.3)}
+.step{border:0;border-radius:999px;background:rgba(120,130,150,.12)}
+.step button{width:42px}
+.step output{min-width:36px;font-size:17px}
+.tools button{border:0;border-radius:12px;background:rgba(120,130,150,.12)}
+.b{width:38px;height:38px;font-size:16px;box-shadow:inset 0 -4px 6px rgba(0,0,0,.25),0 3px 6px rgba(0,0,0,.18)}
+.ticket{padding:11px 10px;border-top:0;border-radius:14px;margin:6px 0;background:rgba(120,130,150,.08)}
+.idx{width:20px;height:20px;border-radius:50%;background:var(--card);display:inline-flex;align-items:center;justify-content:center;font-size:11px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.mini{border-radius:999px;background:var(--card)}
+.nb{width:36px;height:36px;border-radius:50%}
+.gl{font-weight:600;color:var(--fg)}
+.ci input{background:rgba(120,130,150,.07)}
+.empty{border:1.5px dashed var(--bd);border-radius:14px;padding:22px 0}
+h2{font-size:16px;margin:26px 2px 10px;display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--red)}
+.nb.dan.u{background:var(--blue);border-color:var(--blue)}
+.ticket{flex-wrap:nowrap;gap:5px}
+.ticket .b{flex:0 1 38px;width:38px;height:auto;aspect-ratio:1/1;min-width:0;font-size:clamp(11px,4vw,16px)}
+.ticket .plus{margin:0;flex:none}
+.ticket .idx{flex:none}
+.ticket .mini{flex:none;padding:4px 9px;font-size:12px}
+.toast{box-shadow:0 8px 20px rgba(0,0,0,.25)}
+html{background:var(--bg)}
+.hero{position:relative;overflow:hidden;color:#fff;border-radius:24px;padding:22px 18px 16px;margin-bottom:14px;background:linear-gradient(135deg,#e8404f 0%,#bd1530 55%,#8f0f24 100%);box-shadow:0 12px 28px rgba(179,18,42,.32)}
+.hero::before{content:"";position:absolute;right:-46px;top:-56px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.10)}
+.hero::after{content:"";position:absolute;left:-30px;bottom:-70px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.07)}
+.hero>*{position:relative;z-index:1}
+.hero h1{margin:0;font-size:26px;letter-spacing:.08em}
+.hero .sub{margin:3px 0 16px;font-size:13px}
+.hero .today{position:static;background:transparent;box-shadow:none;border-radius:0;padding:0;margin:0;color:#fff;font-size:13px}
+.hero .today::before{display:none}
+.dt{position:absolute;right:18px;top:20px;text-align:right;line-height:1.15}
+.dd{display:block;font-size:22px;font-weight:800}
+.dw{display:block;font-size:12px;letter-spacing:.2em;opacity:.9;margin-top:2px}
+.tl{font-size:12px;opacity:.9;margin-bottom:7px;letter-spacing:.1em}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 11px;font-size:13px;font-weight:600}
+.chip i{font-style:normal;font-weight:400;opacity:.85;margin-left:5px;font-size:12px}
+.hn{font-size:11.5px;opacity:.82;margin-top:8px}
+.hero{background:linear-gradient(125deg,#ec4256 0%,#c4194a 36%,#7a2aa0 64%,#2a5ad9 100%);box-shadow:0 12px 28px rgba(90,40,150,.30)}
+.go{background:linear-gradient(120deg,#e5384a 0%,#b0237a 55%,#2f5fe0 100%);box-shadow:0 8px 18px rgba(90,40,150,.32)}
+.go:active{box-shadow:0 3px 8px rgba(90,40,150,.3)}
+h2::before{background:linear-gradient(180deg,#d62839,#2759d8)}
+#tabs .tab.td{background:linear-gradient(135deg,#ec4256,#c4194a);border-color:transparent}
+#tabs .tab[aria-pressed="true"]:not(.td){background:linear-gradient(135deg,#4a7bf5,#2759d8);border-color:transparent;color:#fff}
+#tabs .tab{padding:11px 4px;font-size:14px}
+.chips{flex-wrap:nowrap;gap:5px}
+.chip{flex:1 1 0;max-width:96px;min-width:0;display:flex;flex-direction:column;align-items:center;padding:6px 2px;border-radius:14px;line-height:1.25;font-size:13px;white-space:nowrap}
+.chip i{margin:0;font-size:11px}
+.hero{background:linear-gradient(125deg,#14a37a 0%,#138fa6 45%,#2a63d8 100%);box-shadow:0 12px 28px rgba(20,120,160,.28)}
+.go{background:linear-gradient(120deg,#1fb088 0%,#1998b0 50%,#2f62e0 100%);box-shadow:0 8px 18px rgba(30,110,170,.30)}
+.go:active{box-shadow:0 3px 8px rgba(30,110,170,.28)}
+h2::before{background:linear-gradient(180deg,#1fb088,#2f62e0)}
+#tabs .tab.td{background:linear-gradient(135deg,#27b88c,#16998c);border-color:transparent}
+.tabs:not(#tabs) .tab[aria-pressed="true"]{background:linear-gradient(135deg,#27b88c,#2f7de1);border-color:transparent;color:#fff}
+.hero{background:radial-gradient(circle at 100% 0%,rgba(238,70,88,.62) 0,rgba(238,70,88,0) 40%),linear-gradient(125deg,#14a37a 0%,#138fa6 45%,#2a63d8 100%)}
+.hero::before{background:rgba(255,170,185,.16)}
+#tabs .tab{position:relative}
+#tabs .tab.td::after{content:"";position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:#ff4d5e;box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+h2::before{background:linear-gradient(180deg,#1fb088 0%,#2f62e0 62%,#ee4658 100%)}
+.hero{background:radial-gradient(ellipse at 100% 45%,rgba(226,58,76,.96) 0,rgba(226,58,76,.6) 26%,rgba(226,58,76,0) 64%),linear-gradient(125deg,#0f9e72 0%,#16a574 50%,#0d8a67 100%);box-shadow:0 12px 28px rgba(40,120,90,.28)}
+.hero::before{background:rgba(255,255,255,.10)}
+#tabs .tab.td::after{display:none}
+#tabs .tab[aria-pressed="true"]:not(.td){background:linear-gradient(135deg,#f0606e,#d12f45);border-color:transparent;color:#fff}
+.go{background:linear-gradient(120deg,#12a077 0%,#25a76c 42%,#e04657 100%);box-shadow:0 8px 18px rgba(120,100,70,.28)}
+.go:active{box-shadow:0 3px 8px rgba(120,100,70,.26)}
+.tabs:not(#tabs) .tab[aria-pressed="true"]{background:linear-gradient(135deg,#27b88c,#16998c);border-color:transparent;color:#fff}
+h2::before{background:linear-gradient(180deg,#1fb088,#e04657)}
+.hero{background:radial-gradient(ellipse at 0% 100%,rgba(18,160,119,.95) 0,rgba(18,160,119,.55) 22%,rgba(18,160,119,0) 50%),linear-gradient(125deg,#ee4d5f 0%,#d6314a 50%,#b81f3a 100%);box-shadow:0 12px 28px rgba(200,50,70,.30)}
+#tabs .tab.td{background:linear-gradient(135deg,#ee5262,#d12f45);border-color:transparent}
+#tabs .tab[aria-pressed="true"]:not(.td){background:linear-gradient(135deg,#27b88c,#16998c);border-color:transparent;color:#fff}
+.go{background:linear-gradient(120deg,#ee4d5f 0%,#d6314a 74%,#18a572 100%);box-shadow:0 8px 18px rgba(214,49,74,.30)}
+.go:active{box-shadow:0 3px 8px rgba(214,49,74,.28)}
+.tabs:not(#tabs) .tab[aria-pressed="true"]{background:linear-gradient(135deg,#ee5262,#d12f45);border-color:transparent;color:#fff}
+h2::before{background:linear-gradient(180deg,#ee4d5f 0%,#d6314a 70%,#18a572 100%)}
+.hero{background:radial-gradient(ellipse at 100% 0%,rgba(18,160,119,.97) 0,rgba(18,160,119,.6) 22%,rgba(18,160,119,0) 52%),linear-gradient(125deg,#ee4d5f 0%,#d6314a 50%,#b81f3a 100%)}
+.hero{background:radial-gradient(circle at 100% 0%,rgba(255,255,255,.22) 0,rgba(255,255,255,0) 45%),linear-gradient(125deg,var(--t1,#d62f3f),var(--t2,#ee5262));box-shadow:0 12px 28px rgba(0,0,0,.18)}
+.hero::before{background:rgba(255,255,255,.12)}
+.go{background:linear-gradient(120deg,var(--t1,#d62f3f),var(--t2,#ee5262));box-shadow:0 8px 18px rgba(0,0,0,.2)}
+.go:active{box-shadow:0 3px 8px rgba(0,0,0,.18)}
+h2::before{background:linear-gradient(180deg,var(--t1,#d62f3f),var(--t2,#ee5262))}
+#tabs .tab{color:var(--a)}
+#tabs .tab.td{background:linear-gradient(135deg,var(--a),var(--b));color:#fff}
+#tabs .tab[aria-pressed="true"]:not(.td){background:var(--card);color:var(--a);outline:3px solid var(--a);outline-offset:0;border-color:transparent}
+.tabs:not(#tabs) .tab[aria-pressed="true"]{background:linear-gradient(135deg,var(--t1,#d62f3f),var(--t2,#ee5262));border-color:transparent;color:#fff}
+.nb{color:var(--red)}
+.nb.u:not(.dan):not(.kill){color:var(--blue)}
+.hero::after{display:none}
+</style>
+</head>
+<body>
+<main>
+<header class="hero"><h1>机选号码</h1>
+<noscript><p class="sub" style="color:var(--red);font-weight:600">当前的打开方式不支持运行程序，请用 Safari 或 Chrome 浏览器打开页面链接。</p></noscript>
+<p class="sub">福彩、体彩常见玩法，手机电脑通用</p>
+<div class="today" id="today"></div></header>
+<div class="tabs" id="tabs" role="group" aria-label="选择玩法"></div>
+<section class="panel">
+  <p class="rule" id="rule"></p>
+  <div class="row" id="kRow" hidden><span>选几个号</span><div class="step"><button data-k="-1" aria-label="减少">−</button><output id="kv">10</output><button data-k="1" aria-label="增加">+</button></div></div>
+  <div class="row"><span>生成注数</span><div class="step"><button data-n="-1" aria-label="减少">−</button><output id="nv">5</output><button data-n="1" aria-label="增加">+</button></div></div>
+  <details class="dk" open><summary>固定号码 / 排除号码（可选）</summary>
+<p class="rule" style="margin-top:8px">先选“固定”或“排除”，再点号码。固定的号码每一注都会包含，其余的号码由机选补齐；排除的号码一定不会出现。数字类玩法按位设置：该位有胆码时只在胆码里选。</p>
+<div class="tabs"><button class="tab" id="mDan" aria-pressed="true">固定</button><button class="tab" id="mKill" aria-pressed="false">排除</button><button class="tab" id="mClr">全部清除</button></div>
+<div id="grids"></div></details>
+<button class="go" id="go">机选号码</button>
+</section>
+<section class="panel" style="margin-top:12px">
+  <div id="out"><div class="empty">点“机选号码”生成</div></div>
+  <div class="tools"><button id="copy">复制全部</button><button id="clr">清空结果</button></div>
+</section>
+<h2>我的固定号码</h2>
+<section class="panel"><p class="rule">天天购买的号码存在这里，只保存在你当前设备的浏览器里。机选结果每行右边的“存”可以直接加入，也可以手动添加。</p><div id="mine"></div><div id="mineIn" style="margin-top:10px"></div><div class="tools"><button id="mAdd">添加号码</button></div><div id="mineOut"></div></section>
+<p class="note">号码由浏览器的加密级随机数生成，每注中奖概率相同，不存在“好号”或规律。请量力而行，理性购彩，未成年人不得购买彩票。</p>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+var R={t:'r'},U={t:'u'};
+var G={
+ssq:{n:'双色球',o:'福彩',rule:'红球从 1–33 选 6 个，蓝球从 1–16 选 1 个',p:[{c:6,a:1,z:33,q:1,t:'r'},{c:1,a:1,z:16,q:1,t:'u'}]},
+dlt:{n:'大乐透',o:'体彩',rule:'前区从 1–35 选 5 个，后区从 1–12 选 2 个',p:[{c:5,a:1,z:35,q:1,t:'r'},{c:2,a:1,z:12,q:1,t:'u'}]},
+
+
+d3:{n:'福彩3D',o:'福彩',rule:'每位从 0–9 选 1 个数字，共 3 位',p:[{c:3,a:0,z:9,q:0,t:'r',d:1}]},
+p3:{n:'排列3',o:'体彩',rule:'每位从 0–9 选 1 个数字，共 3 位',p:[{c:3,a:0,z:9,q:0,t:'r',d:1}]},
+p5:{n:'排列5',o:'体彩',rule:'每位从 0–9 选 1 个数字，共 5 位',p:[{c:5,a:0,z:9,q:0,t:'r',d:1}]},
+qxc:{n:'七星彩',o:'体彩',rule:'前 6 位各选 0–9，最后 1 位选 0–14',p:[{c:6,a:0,z:9,q:0,t:'r',d:1},{c:1,a:0,z:14,q:0,t:'u',d:1}]}
+};
+var TH={dlt:['#1f67dd','#2f86ee','#2a74e6','#f39a1e'],ssq:['#d62f3f','#ee5262','#e03a48','#2f6fe0'],qxc:['#565aa0','#6f74be','#5c62a8','#f39a1e'],p3:['#963a85','#b0539d','#a04590','#f39a1e'],p5:['#1e8f88','#35aaa2','#25968f','#f39a1e'],d3:['#d9822b','#f0a040','#e08a2e','#f39a1e']};
+function applyTheme(k){var r=document.documentElement.style,t=TH[k];r.setProperty('--t1',t[0]);r.setProperty('--t2',t[1]);r.setProperty('--red',t[2]);r.setProperty('--blue',t[3])}
+var ORDER=['dlt','ssq','qxc','p3','p5','d3'];
+var cur='ssq',cnt=5,kk=10,rows=[],HK='lotto-picker-hist';
+var $=function(i){return document.getElementById(i)};
+function rnd(a,z){var r=z-a+1,m=Math.floor(4294967296/r)*r,b=new Uint32Array(1);do{crypto.getRandomValues(b)}while(b[0]>=m);return a+b[0]%r}
+function pad(v,d){return d?String(v):(v<10?'0'+v:String(v))}
+function pick(p,c,ex){
+  var out=[];
+  if(p.q){var pool=[];for(var v=p.a;v<=p.z;v++)if(!ex||ex.indexOf(v)<0)pool.push(v);
+    for(var i=0;i<c;i++){var j=i+rnd(0,pool.length-i-1),t=pool[i];pool[i]=pool[j];pool[j]=t;out.push(pool[i])}
+    out.sort(function(a,b){return a-b})}
+  else for(var i=0;i<c;i++)out.push(rnd(p.a,p.z));
+  return out}
+function one(){var g=G[cur],res=[],si=0;
+ g.p.forEach(function(p,pi){var c=(g.k&&pi===0)?kk:p.c,v=[];
+  if(p.q){var st=sel[cur][si++]||{},dan=[],pool=[];
+   for(var x=p.a;x<=p.z;x++){if(st[x]===1)dan.push(x);else if(!st[x])pool.push(x)}
+   var rest=c-dan.length;
+   if(rest<0)throw new Error('固定号码不能超过 '+c+' 个');
+   if(pool.length<rest)throw new Error('排除的号码太多，剩余号码不够');
+   for(var i=0;i<rest;i++){var j=i+rnd(0,pool.length-i-1),t=pool[i];pool[i]=pool[j];pool[j]=t;dan.push(pool[i])}
+   v=dan.sort(function(a,b){return a-b})}
+  else for(var k=0;k<c;k++){var s2=sel[cur][si++]||{},d=[],pl=[];
+   for(var y=p.a;y<=p.z;y++){if(s2[y]===1)d.push(y);else if(!s2[y])pl.push(y)}
+   var ch=d.length?d:pl;if(!ch.length)throw new Error('第 '+si+' 位的数字被全部杀掉了');v.push(ch[rnd(0,ch.length-1)])}
+  res.push({t:p.t,d:p.d,v:v})});
+ return res}
+function oneOld(){
+  var g=G[cur],res=[],first=[];
+  g.p.forEach(function(p,i){
+    var c=(g.k&&i===0)?kk:p.c;
+    var s=pick(p,c,p.x?first:null);if(i===0)first=s;
+    res.push({t:p.t,d:p.d,v:s})});
+  return res}
+function txt(t){return t.map(function(s){return s.v.map(function(v){return pad(v,s.d)}).join(s.d?'':' ')}).join(' + ')}
+function render(){
+  var o=$('out');o.innerHTML='';
+  if(!rows.length){o.innerHTML='<div class="empty">点“机选号码”生成</div>';return}
+  rows.forEach(function(t,ri){
+    var d=document.createElement('div');d.className='ticket';
+    var ix=document.createElement('span');ix.className='idx';ix.textContent=ri+1;d.appendChild(ix);
+    var n=0;
+    t.forEach(function(s,si){
+      if(si>0){var pl=document.createElement('span');pl.className='plus';pl.textContent='+';d.appendChild(pl)}
+      s.v.forEach(function(v,vi){var b=document.createElement('span');b.className='b '+s.t;b.style.setProperty('--i',n++);b.textContent=pad(v,s.d);d.appendChild(b)})});
+    var sv=document.createElement('button');sv.className='mini';sv.textContent='存';sv.title='存为我的固定号码';sv.onclick=function(){addMine(t)};d.appendChild(sv);o.appendChild(d)})}
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('on')},1400)}
+function loadH(){try{return JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){return[]}}
+function saveH(){
+  try{var h=loadH();h.unshift({g:G[cur].n,t:new Date().toLocaleString('zh-CN',{hour12:false}),r:rows.map(txt)});localStorage.setItem(HK,JSON.stringify(h.slice(0,10)))}catch(e){}
+  showH()}
+function showH(){
+  var h=loadH(),e=$('hist');
+  if(!h.length){e.innerHTML='<div class="h">暂无记录</div>';return}
+  e.innerHTML='';
+  h.forEach(function(x){var d=document.createElement('div');d.className='h';
+    var b=document.createElement('b');b.textContent=x.g+' '+x.t;d.appendChild(b);
+    x.r.forEach(function(l){d.appendChild(document.createElement('br'));d.appendChild(document.createTextNode(l))});
+    e.appendChild(d)})}
+function tabs(){
+  var t=$('tabs');banner();t.innerHTML='';
+  ORDER.forEach(function(k){
+    var b=document.createElement('button');b.className='tab'+(isToday(k)?' td':'');b.setAttribute('aria-pressed',k===cur);b.style.setProperty('--a',TH[k][0]);b.style.setProperty('--b',TH[k][1]);
+    b.textContent=G[k].n;
+    b.onclick=function(){cur=k;rows=[];tabs();info();grids();mineInit();showMine();render()};
+    t.appendChild(b)})}
+function info(){applyTheme(cur);$('rule').textContent=G[cur].rule+'。开奖：'+days(cur);$('kRow').hidden=!G[cur].k;$('kv').textContent=kk;$('nv').textContent=cnt}
+document.addEventListener('click',function(e){
+  var n=e.target.getAttribute&&e.target.getAttribute('data-n'),k=e.target.getAttribute&&e.target.getAttribute('data-k');
+  if(n){cnt=Math.max(1,Math.min(20,cnt+ +n));info()}
+  if(k){kk=Math.max(1,Math.min(10,kk+ +k));info()}});
+$('go').onclick=function(){var r=[];try{for(var i=0;i<cnt;i++)r.push(one())}catch(e){toast(e.message);return}rows=r;render()};
+$('clr').onclick=function(){rows=[];render()};
+$('copy').onclick=function(){
+  if(!rows.length){toast('还没有号码');return}
+  var s=G[cur].n+'\n'+rows.map(function(t,i){return(i+1)+'. '+txt(t)}).join('\n');
+  function fb(){var a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('已复制')}catch(e){toast('复制失败，请手动选取')}document.body.removeChild(a)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(function(){toast('已复制')},fb);else fb()};
+var mode=1,sel={},LBL={ssq:['红球','蓝球'],dlt:['前区','后区']};
+function slots(){var g=G[cur],o=[],n=0;g.p.forEach(function(p,i){if(p.q)o.push({l:(LBL[cur]||[])[i]||'号码',a:p.a,z:p.z,d:p.d,t:p.t});else for(var j=0;j<p.c;j++)o.push({l:'第 '+(++n)+' 位',a:p.a,z:p.z,d:1,t:p.t})});return o}
+function grids(){
+ var S=slots();if(!sel[cur])sel[cur]=S.map(function(){return{}});
+ var el=$('grids');el.innerHTML='';
+ S.forEach(function(s,i){var w=document.createElement('div'),h=document.createElement('div'),gr=document.createElement('div');
+  h.className='gl';h.textContent=s.l;gr.className='gr';w.appendChild(h);
+  for(var v=s.a;v<=s.z;v++)(function(v){var b=document.createElement('button'),st=sel[cur][i][v]||0;
+   b.className='nb'+(st===1?' dan':st===2?' kill':'')+(s.t==='u'?' u':'');b.textContent=pad(v,s.d);
+   b.onclick=function(){var o=sel[cur][i];if(o[v]===mode)delete o[v];else o[v]=mode;grids()};gr.appendChild(b)})(v);
+  w.appendChild(gr);el.appendChild(w)})}
+function setMode(m){mode=m;$('mDan').setAttribute('aria-pressed',m===1);$('mKill').setAttribute('aria-pressed',m===2)}
+$('mDan').onclick=function(){setMode(1)};$('mKill').onclick=function(){setMode(2)};
+$('mClr').onclick=function(){delete sel[cur];grids()};
+var WD=['日','一','二','三','四','五','六'],ALL=[0,1,2,3,4,5,6];
+var SCH={ssq:{d:[2,4,0],t:'21:15'},dlt:{d:[1,3,6],t:'20:30'},kl8:{d:ALL,t:'21:30'},qlc:{d:[1,3,5],t:'21:15'},d3:{d:ALL,t:'21:15'},p3:{d:ALL,t:'20:30'},p5:{d:ALL,t:'20:30'},qxc:{d:[2,5,0],t:'20:30'}};
+function days(k){var s=SCH[k];if(s.d.length===7)return'每天';return'周'+[1,2,3,4,5,6,0].filter(function(x){return s.d.indexOf(x)>=0}).map(function(x){return WD[x]}).join('、')}
+function nowInfo(k){var s=SCH[k],n=new Date(),hm=n.getHours()*60+n.getMinutes(),t=s.t.split(':'),on=s.d.indexOf(n.getDay())>=0;return{on:on,done:on&&hm>=(+t[0])*60+(+t[1])}}
+function pickDefault(){var t=(new Date().getDay()+1)%7,i;for(i=0;i<ORDER.length;i++)if(isToday(ORDER[i]))return ORDER[i];for(i=0;i<ORDER.length;i++)if(SCH[ORDER[i]].d.indexOf(t)>=0)return ORDER[i];return ORDER[0]}
+function isToday(k){var i=nowInfo(k);return i.on&&!i.done}
+function sch(k){var s=SCH[k],d=new Date().getDay(),i=nowInfo(k);
+ if(i.on&&!i.done)return '今晚 '+s.t+' 开奖';
+ var nx='';for(var j=1;j<=7;j++){var x=(d+j)%7;if(s.d.indexOf(x)>=0){nx=j===1?'明天':'周'+WD[x];break}}
+ return (i.done?'今日已开奖，':'')+'下次 '+nx}
+function banner(){var n=new Date(),on=[],dn=[],e=$('today');
+ ORDER.forEach(function(k){var i=nowInfo(k);if(i.on&&!i.done)on.push([G[k].n,SCH[k].t]);else if(i.on)dn.push(G[k].n)});
+ var h='<div class="dt"><span class="dd">'+(n.getMonth()+1)+'月'+n.getDate()+'日</span><span class="dw">周'+WD[n.getDay()]+'</span></div>';
+ h+='<div class="tl">'+(on.length?'今晚开奖':'今晚没有开奖的玩法')+'</div>';
+ if(on.length)h+='<div class="chips">'+on.map(function(x){return '<span class="chip">'+x[0]+'<i>'+x[1]+'</i></span>'}).join('')+'</div>';
+ if(dn.length)h+='<div class="hn">今日已开奖：'+dn.join('、')+'</div>';
+ h+='<div class="hn">彩色背景的玩法今晚开奖，购买请留意售票点的停售时间。</div>';
+ e.innerHTML=h}
+function loadM(){try{return JSON.parse(localStorage.getItem('lotto-mine')||'{}')}catch(e){return{}}}
+var MINE=loadM();
+function saveM(){try{localStorage.setItem('lotto-mine',JSON.stringify(MINE))}catch(e){toast('浏览器禁止存储，关闭页面后会丢失')}}
+function addMine(t){var l=MINE[cur]||(MINE[cur]=[]),s=txt(t);if(l.some(function(x){return txt(x)===s})){toast('已经存过了');return}l.push(t);saveM();showMine();toast('已加入我的固定号码')}
+function showMine(){var o=$('mine'),l=MINE[cur]||[];o.innerHTML='';$('mineOut').innerHTML='';
+ if(!l.length){o.innerHTML='<div class="empty">这个玩法还没有固定号码</div>';return}
+ l.forEach(function(t,i){var d=document.createElement('div'),n=0;d.className='ticket';
+  t.forEach(function(s,si){if(si>0){var pl=document.createElement('span');pl.className='plus';pl.textContent='+';d.appendChild(pl)}
+   s.v.forEach(function(v){var b=document.createElement('span');b.className='b '+s.t;b.style.setProperty('--i',n++);b.textContent=pad(v,s.d);d.appendChild(b)})});
+  var x=document.createElement('button');x.className='mini';x.textContent='删除';x.onclick=function(){MINE[cur].splice(i,1);saveM();showMine()};d.appendChild(x);o.appendChild(d)})}
+function mineInit(){var e=$('mineIn'),g=G[cur];e.innerHTML='';
+ g.p.forEach(function(p,i){var l=document.createElement('label'),n=document.createElement('input');l.className='ci';
+  l.appendChild(document.createTextNode(LBL[cur]?LBL[cur][i]:cur==='qxc'?['前6位','第7位'][i]:'号码'));
+  n.type='text';n.inputMode='numeric';n.id='mi'+i;n.placeholder=(g.k&&i===0?'1–10':p.c)+' 个号码，空格分隔';l.appendChild(n);e.appendChild(l)})}
+function addManual(){var g=G[cur],t=[];
+ for(var i=0;i<g.p.length;i++){var p=g.p[i],s=$('mi'+i).value.trim(),a;
+  if(p.d&&p.c>1&&/^\d+$/.test(s)&&s.length===p.c)a=s.split('').map(Number);else a=(s.match(/\d+/g)||[]).map(Number);
+  var ok=g.k&&i===0?(a.length>=1&&a.length<=10):a.length===p.c;
+  if(!ok||a.some(function(x){return x<p.a||x>p.z})||(p.q&&new Set(a).size!==a.length)){toast('第 '+(i+1)+' 组需要 '+(g.k&&i===0?'1–10':p.c)+' 个 '+p.a+'–'+p.z+(p.q?'，不能重复':'')+' 的号码');return}
+  t.push({t:p.t,d:p.d,v:p.q?a.sort(function(x,y){return x-y}):a})}
+ g.p.forEach(function(p,i){$('mi'+i).value=''});addMine(t)}
+$('mAdd').onclick=addManual;
+cur=pickDefault();tabs();info();grids();setMode(1);mineInit();showMine();
+</script>
+</body>
+</html>
