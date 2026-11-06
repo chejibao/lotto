@@ -174,6 +174,48 @@ h2::before{background:linear-gradient(180deg,var(--t1,#d62f3f),var(--t2,#ee5262)
 .nb{color:var(--red)}
 .nb.u:not(.dan):not(.kill){color:var(--blue)}
 .hero::after{display:none}
+#out .b{cursor:pointer}
+.b.sel{outline:3px solid var(--fg);outline-offset:2px}
+.pickbar{position:sticky;bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:8px 10px;background:var(--card);border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.22);font-size:14px;z-index:5}
+.pickbar b{color:var(--t1,#d62f3f);font-size:16px}
+.pickbar button{border:0;border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer;background:rgba(120,130,150,.15);color:var(--fg)}
+.pickbar #pkFix{background:linear-gradient(135deg,var(--t1,#d62f3f),var(--t2,#ee5262));color:#fff}
+.sth{font-size:13px;font-weight:600;margin:14px 0 2px}
+.sc{--c:var(--red);position:relative;width:36px;height:36px;padding:0;border-radius:50%;border:1px solid var(--bd);background:transparent;color:var(--fg);font-size:13px;cursor:pointer}
+.sc.u{--c:var(--blue)}
+.sc::before{content:"";position:absolute;inset:-1px;border-radius:50%;background:var(--c);opacity:var(--h,0)}
+.sc .t{position:relative;z-index:1}
+.sc.hot{color:#fff}
+.sc i{position:absolute;z-index:2;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 3px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:10px;font-style:normal;line-height:16px;text-align:center}
+.sc.sel{outline:3px solid var(--fg);outline-offset:1px}
+.quick{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.24)}
+.ql{font-size:12px;opacity:.88;letter-spacing:.1em;margin-right:2px}
+.qk{font:inherit;font-size:13px;font-weight:600;color:#fff;text-decoration:none;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.34);border-radius:999px;padding:4px 12px;cursor:pointer}
+.qa{background:transparent;border-style:dashed;font-weight:400}
+main{padding-top:10px}
+.hero{padding:14px 16px 11px;margin-bottom:10px;border-radius:20px}
+.hero h1{font-size:22px;line-height:1.15}
+.hero .sub{margin:2px 0 8px;font-size:12px}
+.hero::before{width:130px;height:130px;right:-40px;top:-50px}
+.dt{top:13px;right:16px}
+.dd{font-size:19px}
+.dw{font-size:11px;margin-top:1px}
+.tg{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:5px}
+.tt{min-width:74px;font-size:12px;opacity:.92}
+.tn{font-size:12.5px}
+.chip{padding:1px 9px;font-size:12px;white-space:nowrap}
+.hn{font-size:11px;margin-top:6px}
+.quick{margin-top:8px;padding-top:8px;gap:5px}
+.qk{padding:2px 10px;font-size:12px}
+.qf{display:flex;flex-wrap:wrap;gap:6px;width:100%;margin-top:4px}
+.qf input{flex:1 1 90px;min-width:0;border:0;border-radius:10px;padding:5px 9px;font-size:16px;background:rgba(255,255,255,.94);color:#1b2230}
+.qf input:nth-child(2){flex:2 1 170px}
+.chip,.qk{display:inline-block;flex:none;max-width:none;box-sizing:border-box;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:600;line-height:1.5;white-space:nowrap;color:#fff;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.34)}
+.qa{background:transparent;border-style:dashed;font-weight:400}
+.tg{gap:6px;margin-top:6px}
+.tt{min-width:70px;font-size:12px}
+.hn{margin-top:8px}
+.quick{gap:6px;margin-top:8px;padding-top:9px}
 </style>
 </head>
 <body>
@@ -181,7 +223,7 @@ h2::before{background:linear-gradient(180deg,var(--t1,#d62f3f),var(--t2,#ee5262)
 <header class="hero"><h1>机选号码</h1>
 <noscript><p class="sub" style="color:var(--red);font-weight:600">当前的打开方式不支持运行程序，请用 Safari 或 Chrome 浏览器打开页面链接。</p></noscript>
 <p class="sub">福彩、体彩常见玩法，手机电脑通用</p>
-<div class="today" id="today"></div></header>
+<div class="today" id="today"></div><div class="quick" id="quick"></div></header>
 <div class="tabs" id="tabs" role="group" aria-label="选择玩法"></div>
 <section class="panel">
   <p class="rule" id="rule"></p>
@@ -195,7 +237,10 @@ h2::before{background:linear-gradient(180deg,var(--t1,#d62f3f),var(--t2,#ee5262)
 </section>
 <section class="panel" style="margin-top:12px">
   <div id="out"><div class="empty">点“机选号码”生成</div></div>
-  <div class="tools"><button id="copy">复制全部</button><button id="clr">清空结果</button></div>
+  <div id="stats"></div>
+<div class="note" id="pkHint" style="margin:6px 0 0" hidden>点结果里的号码可以选中，再决定设为固定还是排除。</div>
+<div class="pickbar" id="pickBar" hidden>已选 <b id="pkn">0</b> 个<span id="pkc"></span>：<button id="pkFix">设为固定</button><button id="pkEx">设为排除</button><button id="pkClr">取消</button></div>
+<div class="tools"><button id="copy">复制全部</button><button id="clr">清空结果</button></div>
 </section>
 <h2>我的固定号码</h2>
 <section class="panel"><p class="rule">天天购买的号码存在这里，只保存在你当前设备的浏览器里。机选结果每行右边的“存”可以直接加入，也可以手动添加。</p><div id="mine"></div><div id="mineIn" style="margin-top:10px"></div><div class="tools"><button id="mAdd">添加号码</button></div><div id="mineOut"></div></section>
@@ -217,7 +262,7 @@ qxc:{n:'七星彩',o:'体彩',rule:'前 6 位各选 0–9，最后 1 位选 0–
 var TH={dlt:['#1f67dd','#2f86ee','#2a74e6','#f39a1e'],ssq:['#d62f3f','#ee5262','#e03a48','#2f6fe0'],qxc:['#565aa0','#6f74be','#5c62a8','#f39a1e'],p3:['#963a85','#b0539d','#a04590','#f39a1e'],p5:['#1e8f88','#35aaa2','#25968f','#f39a1e'],d3:['#d9822b','#f0a040','#e08a2e','#f39a1e']};
 function applyTheme(k){var r=document.documentElement.style,t=TH[k];r.setProperty('--t1',t[0]);r.setProperty('--t2',t[1]);r.setProperty('--red',t[2]);r.setProperty('--blue',t[3])}
 var ORDER=['dlt','ssq','qxc','p3','p5','d3'];
-var cur='ssq',cnt=5,kk=10,rows=[],HK='lotto-picker-hist';
+var cur='ssq',cnt=10,kk=10,rows=[],HK='lotto-picker-hist';
 var $=function(i){return document.getElementById(i)};
 function rnd(a,z){var r=z-a+1,m=Math.floor(4294967296/r)*r,b=new Uint32Array(1);do{crypto.getRandomValues(b)}while(b[0]>=m);return a+b[0]%r}
 function pad(v,d){return d?String(v):(v<10?'0'+v:String(v))}
@@ -250,7 +295,7 @@ function oneOld(){
     res.push({t:p.t,d:p.d,v:s})});
   return res}
 function txt(t){return t.map(function(s){return s.v.map(function(v){return pad(v,s.d)}).join(s.d?'':' ')}).join(' + ')}
-function render(){
+function render(){PK={};updatePickBar();drawStats();
   var o=$('out');o.innerHTML='';
   if(!rows.length){o.innerHTML='<div class="empty">点“机选号码”生成</div>';return}
   rows.forEach(function(t,ri){
@@ -259,7 +304,7 @@ function render(){
     var n=0;
     t.forEach(function(s,si){
       if(si>0){var pl=document.createElement('span');pl.className='plus';pl.textContent='+';d.appendChild(pl)}
-      s.v.forEach(function(v,vi){var b=document.createElement('span');b.className='b '+s.t;b.style.setProperty('--i',n++);b.textContent=pad(v,s.d);d.appendChild(b)})});
+      s.v.forEach(function(v,vi){var b=document.createElement('span'),ky=si+':'+v;b.className='b '+s.t;b.dataset.k=ky;b.dataset.s=slotIdx(si,vi);b.onclick=function(){togglePick(ky)};b.style.setProperty('--i',n++);b.textContent=pad(v,s.d);d.appendChild(b)})});
     var sv=document.createElement('button');sv.className='mini';sv.textContent='存';sv.title='存为我的固定号码';sv.onclick=function(){addMine(t)};d.appendChild(sv);o.appendChild(d)})}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('on')},1400)}
 function loadH(){try{return JSON.parse(localStorage.getItem(HK)||'[]')}catch(e){return[]}}
@@ -284,7 +329,7 @@ function tabs(){
 function info(){applyTheme(cur);$('rule').textContent=G[cur].rule+'。开奖：'+days(cur);$('kRow').hidden=!G[cur].k;$('kv').textContent=kk;$('nv').textContent=cnt}
 document.addEventListener('click',function(e){
   var n=e.target.getAttribute&&e.target.getAttribute('data-n'),k=e.target.getAttribute&&e.target.getAttribute('data-k');
-  if(n){cnt=Math.max(1,Math.min(20,cnt+ +n));info()}
+  if(n){cnt=Math.max(1,Math.min(10,cnt+ +n));info()}
   if(k){kk=Math.max(1,Math.min(10,kk+ +k));info()}});
 $('go').onclick=function(){var r=[];try{for(var i=0;i<cnt;i++)r.push(one())}catch(e){toast(e.message);return}rows=r;RES[cur]=r;saveR();render()};
 $('clr').onclick=function(){rows=[];RES[cur]=[];saveR();render()};
@@ -293,6 +338,50 @@ $('copy').onclick=function(){
   var s=G[cur].n+'\n'+rows.map(function(t,i){return(i+1)+'. '+txt(t)}).join('\n');
   function fb(){var a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('已复制')}catch(e){toast('复制失败，请手动选取')}document.body.removeChild(a)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(function(){toast('已复制')},fb);else fb()};
+var PK={};
+function partLabel(si){return LBL[cur]?LBL[cur][si]:(cur==='qxc'?['前6位','第7位'][si]:'号码')}
+function drawStats(){var o=$('stats'),P=G[cur].p;o.innerHTML='';if(!rows.length)return;
+ var h=document.createElement('div');h.className='sth';h.textContent='号码统计（颜色越深出现越多，点号码可选中）';o.appendChild(h);
+ P.forEach(function(p,si){var c={},mx=0;
+  rows.forEach(function(t){var s=t[si];if(!s)return;s.v.forEach(function(v){c[v]=(c[v]||0)+1;if(c[v]>mx)mx=c[v]})});
+  var w=document.createElement('div'),l=document.createElement('div'),gr=document.createElement('div');w.className='stp';l.className='gl';l.textContent=partLabel(si);gr.className='gr';w.appendChild(l);
+  for(var v=p.a;v<=p.z;v++)(function(v){var n=c[v]||0,b=document.createElement('button'),k=si+':'+v;
+   b.className='sc'+(p.t==='u'?' u':'')+(n&&n/mx>=.5?' hot':'')+(PK[k]?' sel':'');b.dataset.k=k;
+   b.style.setProperty('--h',n?(0.22+0.78*n/mx):0);
+   b.innerHTML='<span class="t">'+pad(v,p.d)+'</span>'+(n?'<i>'+n+'</i>':'');b.onclick=function(){togglePick(k)};gr.appendChild(b)})(v);
+  w.appendChild(gr);
+  var top=[],miss=[];for(var x=p.a;x<=p.z;x++){var n2=c[x]||0;if(mx>0&&n2===mx)top.push(pad(x,p.d));if(!n2)miss.push(pad(x,p.d))}
+  var sm=document.createElement('div');sm.className='note';sm.style.margin='6px 0 0';
+  sm.textContent='出现最多：'+top.slice(0,8).join('、')+'（'+mx+' 次）；未出现：'+(miss.length>12?miss.length+' 个':(miss.join('、')||'无'));
+  w.appendChild(sm);o.appendChild(w)})}
+var LK0=[{n:'App号码客',u:'https://appsmk.com'},{n:'节点订阅',u:'https://jie.appsmk.com'}],LED=false,QADD=false,LKEY='lotto-links2';
+function loadL(){try{var a=JSON.parse(localStorage.getItem(LKEY));return Array.isArray(a)?a:LK0.slice()}catch(e){return LK0.slice()}}
+var LINKS=loadL();
+function saveL(){try{localStorage.setItem(LKEY,JSON.stringify(LINKS))}catch(e){toast('浏览器禁止存储')}}
+function normUrl(u){u=u.trim();if(!u)return'';if(!/^https?:\/\//i.test(u))u='https://'+u;try{var x=new URL(u);return(x.protocol==='http:'||x.protocol==='https:')?x.href:''}catch(e){return''}}
+function mk(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
+function drawQuick(){var q=$('quick');q.innerHTML='';q.appendChild(mk('span','ql','快捷入口'));
+ LINKS.forEach(function(k,i){var a=mk('a','qk',k.n);a.href=k.u;a.target='_blank';a.rel='noopener noreferrer';
+  if(LED){a.appendChild(mk('b','',' ×'));a.onclick=function(e){e.preventDefault();LINKS.splice(i,1);saveL();drawQuick()}}
+  q.appendChild(a)});
+ var ad=mk('button','qk qa','＋ 添加'),ed=mk('button','qk qa',LED?'完成':'管理');
+ ad.onclick=function(){QADD=!QADD;LED=false;drawQuick()};
+ ed.onclick=function(){LED=!LED;QADD=false;drawQuick()};
+ q.appendChild(ad);if(LINKS.length||LED)q.appendChild(ed);
+ if(QADD){var f=mk('div','qf'),n=mk('input'),u=mk('input'),ok=mk('button','qk','确定'),no=mk('button','qk qa','取消');
+  n.placeholder='名称';n.maxLength=12;u.placeholder='网址，如 https://appsmk.com';u.inputMode='url';
+  var go=function(){var nm=n.value.trim(),url=normUrl(u.value);if(!nm){toast('请输入名称');return}if(!url){toast('网址不正确');return}LINKS.push({n:nm,u:url});saveL();QADD=false;drawQuick()};
+  ok.onclick=go;no.onclick=function(){QADD=false;drawQuick()};u.onkeydown=function(e){if(e.key==='Enter')go()};
+  f.appendChild(n);f.appendChild(u);f.appendChild(ok);f.appendChild(no);q.appendChild(f);n.focus()}}
+drawQuick();
+function slotIdx(si,vi){var n=0,P=G[cur].p;for(var i=0;i<si;i++)n+=P[i].q?1:P[i].c;return P[si].q?n:n+vi}
+function updatePickBar(){var ks=Object.keys(PK),n=ks.length,els=document.querySelectorAll('#out .b'),t=ks.map(function(ky){var a=ky.split(':'),c=0;els.forEach(function(e){if(e.dataset.k===ky)c++});return pad(+a[1],(G[cur].p[+a[0]]||{}).d)+' 出现 '+c+' 次'});$('pkn').textContent=n;$('pkc').textContent=n?'（'+t.join('，')+'）':'';$('pickBar').hidden=!n;$('pkHint').hidden=!rows.length||n>0}
+function clearPick(){PK={};document.querySelectorAll('#out .b.sel,#stats .sc.sel').forEach(function(e){e.classList.remove('sel')});updatePickBar()}
+function togglePick(ky){if(PK[ky])delete PK[ky];else PK[ky]=1;document.querySelectorAll('#out .b,#stats .sc').forEach(function(e){if(e.dataset.k===ky)e.classList.toggle('sel')});updatePickBar()}
+function applyPick(m){var ks=Object.keys(PK),n=ks.length;if(!n)return;
+ document.querySelectorAll('#out .b').forEach(function(e){if(!PK[e.dataset.k])return;var i=+e.dataset.s,v=+e.dataset.k.split(':')[1];sel[cur]=sel[cur]||[];sel[cur][i]=sel[cur][i]||{};sel[cur][i][v]=m});
+ saveS();grids();clearPick();toast('\u5df2\u628a '+n+' \u4e2a\u53f7\u7801\u8bbe\u4e3a'+(m===1?'\u56fa\u5b9a':'\u6392\u9664'))}
+$('pkFix').onclick=function(){applyPick(1)};$('pkEx').onclick=function(){applyPick(2)};$('pkClr').onclick=clearPick;
 function loadR(){try{var o=JSON.parse(localStorage.getItem('lotto-res')||'{}');return o&&typeof o==='object'?o:{}}catch(e){return{}}}
 function saveR(){try{localStorage.setItem('lotto-res',JSON.stringify(RES))}catch(e){}}
 var RES=loadR();
@@ -322,11 +411,11 @@ function sch(k){var s=SCH[k],d=new Date().getDay(),i=nowInfo(k);
  if(i.on&&!i.done)return '今晚 '+s.t+' 开奖';
  var nx='';for(var j=1;j<=7;j++){var x=(d+j)%7;if(s.d.indexOf(x)>=0){nx=j===1?'明天':'周'+WD[x];break}}
  return (i.done?'今日已开奖，':'')+'下次 '+nx}
-function banner(){var n=new Date(),on=[],dn=[],e=$('today');
- ORDER.forEach(function(k){var i=nowInfo(k);if(i.on&&!i.done)on.push([G[k].n,SCH[k].t]);else if(i.on)dn.push(G[k].n)});
+function banner(){var n=new Date(),on={},dn=[],e=$('today'),cnt=0;
+ ORDER.forEach(function(k){var i=nowInfo(k);if(i.on&&!i.done){(on[SCH[k].t]=on[SCH[k].t]||[]).push(G[k].n);cnt++}else if(i.on)dn.push(G[k].n)});
  var h='<div class="dt"><span class="dd">'+(n.getMonth()+1)+'月'+n.getDate()+'日</span><span class="dw">周'+WD[n.getDay()]+'</span></div>';
- h+='<div class="tl">'+(on.length?'今晚开奖':'今晚没有开奖的玩法')+'</div>';
- if(on.length)h+='<div class="chips">'+on.map(function(x){return '<span class="chip">'+x[0]+'<i>'+x[1]+'</i></span>'}).join('')+'</div>';
+ if(!cnt)h+='<div class="tg"><span class="tn">今晚没有开奖的玩法</span></div>';
+ Object.keys(on).sort().forEach(function(t,i){h+='<div class="tg"><span class="tt">'+(i?'':'今晚 ')+t+'</span>'+on[t].map(function(x){return '<span class="chip">'+x+'</span>'}).join('')+'</div>'});
  if(dn.length)h+='<div class="hn">今日已开奖：'+dn.join('、')+'</div>';
  h+='<div class="hn">彩色背景的玩法今晚开奖，购买请留意售票点的停售时间。</div>';
  e.innerHTML=h}
