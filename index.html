@@ -216,6 +216,9 @@ main{padding-top:10px}
 .tt{min-width:70px;font-size:12px}
 .hn{margin-top:8px}
 .quick{gap:6px;margin-top:8px;padding-top:9px}
+.stbar{margin-top:12px}
+.pill{border:1px solid var(--bd);background:transparent;color:var(--fg);border-radius:999px;padding:6px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.pill.on{background:linear-gradient(135deg,var(--t1,#d62f3f),var(--t2,#ee5262));border-color:transparent;color:#fff}
 </style>
 </head>
 <body>
@@ -237,7 +240,8 @@ main{padding-top:10px}
 </section>
 <section class="panel" style="margin-top:12px">
   <div id="out"><div class="empty">点“机选号码”生成</div></div>
-  <div id="stats"></div>
+  <div class="stbar" id="stbar" hidden><button class="pill" id="stBtn">号码统计 ▾</button></div>
+<div id="stats"></div>
 <div class="note" id="pkHint" style="margin:6px 0 0" hidden>点结果里的号码可以选中，再决定设为固定还是排除。</div>
 <div class="pickbar" id="pickBar" hidden>已选 <b id="pkn">0</b> 个<span id="pkc"></span>：<button id="pkFix">设为固定</button><button id="pkEx">设为排除</button><button id="pkClr">取消</button></div>
 <div class="tools"><button id="copy">复制全部</button><button id="clr">清空结果</button></div>
@@ -339,8 +343,10 @@ $('copy').onclick=function(){
   function fb(){var a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('已复制')}catch(e){toast('复制失败，请手动选取')}document.body.removeChild(a)}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(s).then(function(){toast('已复制')},fb);else fb()};
 var PK={};
+var STOPEN=false;
+$('stBtn').onclick=function(){STOPEN=!STOPEN;drawStats()};
 function partLabel(si){return LBL[cur]?LBL[cur][si]:(cur==='qxc'?['前6位','第7位'][si]:'号码')}
-function drawStats(){var o=$('stats'),P=G[cur].p;o.innerHTML='';if(!rows.length)return;
+function drawStats(){var o=$('stats'),P=G[cur].p;o.innerHTML='';$('stbar').hidden=!rows.length;$('stBtn').textContent=STOPEN?'号码统计 ▴':'号码统计 ▾';$('stBtn').classList.toggle('on',STOPEN);if(!rows.length||!STOPEN)return;
  var h=document.createElement('div');h.className='sth';h.textContent='号码统计（颜色越深出现越多，点号码可选中）';o.appendChild(h);
  P.forEach(function(p,si){var c={},mx=0;
   rows.forEach(function(t){var s=t[si];if(!s)return;s.v.forEach(function(v){c[v]=(c[v]||0)+1;if(c[v]>mx)mx=c[v]})});
@@ -354,25 +360,15 @@ function drawStats(){var o=$('stats'),P=G[cur].p;o.innerHTML='';if(!rows.length)
   var sm=document.createElement('div');sm.className='note';sm.style.margin='6px 0 0';
   sm.textContent='出现最多：'+top.slice(0,8).join('、')+'（'+mx+' 次）；未出现：'+(miss.length>12?miss.length+' 个':(miss.join('、')||'无'));
   w.appendChild(sm);o.appendChild(w)})}
-var LK0=[{n:'App号码客',u:'https://appsmk.com'},{n:'节点订阅',u:'https://jie.appsmk.com'}],LED=false,QADD=false,LKEY='lotto-links2';
-function loadL(){try{var a=JSON.parse(localStorage.getItem(LKEY));return Array.isArray(a)?a:LK0.slice()}catch(e){return LK0.slice()}}
-var LINKS=loadL();
-function saveL(){try{localStorage.setItem(LKEY,JSON.stringify(LINKS))}catch(e){toast('浏览器禁止存储')}}
-function normUrl(u){u=u.trim();if(!u)return'';if(!/^https?:\/\//i.test(u))u='https://'+u;try{var x=new URL(u);return(x.protocol==='http:'||x.protocol==='https:')?x.href:''}catch(e){return''}}
-function mk(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
-function drawQuick(){var q=$('quick');q.innerHTML='';q.appendChild(mk('span','ql','快捷入口'));
- LINKS.forEach(function(k,i){var a=mk('a','qk',k.n);a.href=k.u;a.target='_blank';a.rel='noopener noreferrer';
-  if(LED){a.appendChild(mk('b','',' ×'));a.onclick=function(e){e.preventDefault();LINKS.splice(i,1);saveL();drawQuick()}}
-  q.appendChild(a)});
- var ad=mk('button','qk qa','＋ 添加'),ed=mk('button','qk qa',LED?'完成':'管理');
- ad.onclick=function(){QADD=!QADD;LED=false;drawQuick()};
- ed.onclick=function(){LED=!LED;QADD=false;drawQuick()};
- q.appendChild(ad);if(LINKS.length||LED)q.appendChild(ed);
- if(QADD){var f=mk('div','qf'),n=mk('input'),u=mk('input'),ok=mk('button','qk','确定'),no=mk('button','qk qa','取消');
-  n.placeholder='名称';n.maxLength=12;u.placeholder='网址，如 https://appsmk.com';u.inputMode='url';
-  var go=function(){var nm=n.value.trim(),url=normUrl(u.value);if(!nm){toast('请输入名称');return}if(!url){toast('网址不正确');return}LINKS.push({n:nm,u:url});saveL();QADD=false;drawQuick()};
-  ok.onclick=go;no.onclick=function(){QADD=false;drawQuick()};u.onkeydown=function(e){if(e.key==='Enter')go()};
-  f.appendChild(n);f.appendChild(u);f.appendChild(ok);f.appendChild(no);q.appendChild(f);n.focus()}}
+/* ===== 入口列表：想增删网站，只改下面这一段 ===== */
+var LINKS=[
+ {n:'App号码客',u:'https://appsmk.com'},
+ {n:'节点订阅',u:'https://jie.appsmk.com'}
+];
+/* ===== 入口列表结束 ===== */
+function drawQuick(){var q=$('quick');q.innerHTML='';
+ LINKS.forEach(function(k){var a=document.createElement('a');a.className='qk';a.textContent=k.n;a.href=k.u;a.target='_blank';a.rel='noopener noreferrer';q.appendChild(a)});
+ q.hidden=!LINKS.length}
 drawQuick();
 function slotIdx(si,vi){var n=0,P=G[cur].p;for(var i=0;i<si;i++)n+=P[i].q?1:P[i].c;return P[si].q?n:n+vi}
 function updatePickBar(){var ks=Object.keys(PK),n=ks.length,els=document.querySelectorAll('#out .b'),t=ks.map(function(ky){var a=ky.split(':'),c=0;els.forEach(function(e){if(e.dataset.k===ky)c++});return pad(+a[1],(G[cur].p[+a[0]]||{}).d)+' 出现 '+c+' 次'});$('pkn').textContent=n;$('pkc').textContent=n?'（'+t.join('，')+'）':'';$('pickBar').hidden=!n;$('pkHint').hidden=!rows.length||n>0}
