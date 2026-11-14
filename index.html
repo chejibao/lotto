@@ -219,6 +219,15 @@ main{padding-top:10px}
 .stbar{margin-top:12px}
 .pill{border:1px solid var(--bd);background:transparent;color:var(--fg);border-radius:999px;padding:6px 16px;font-size:13px;font-weight:600;cursor:pointer}
 .pill.on{background:linear-gradient(135deg,var(--t1,#d62f3f),var(--t2,#ee5262));border-color:transparent;color:#fff}
+.chip.dc{font-family:inherit;cursor:pointer}
+.chip.dc.on{background:rgba(255,255,255,.42);border-color:#fff}
+.tg .tt+.chip.dc{margin-left:0}
+.dn{display:flex;align-items:center;gap:5px;margin-top:6px;overflow-x:auto;white-space:nowrap;padding:3px 2px}
+.hb{flex:none;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;box-shadow:0 0 0 1.5px rgba(255,255,255,.9)}
+.dp{flex:none;opacity:.9}
+.dn .qk{flex:none}
+.dq{padding:1px 9px}
+.di{flex:1 1 120px;min-width:0;border:0;border-radius:10px;padding:3px 9px;font-size:16px;background:rgba(255,255,255,.94);color:#1b2230}
 </style>
 </head>
 <body>
@@ -407,14 +416,48 @@ function sch(k){var s=SCH[k],d=new Date().getDay(),i=nowInfo(k);
  if(i.on&&!i.done)return '今晚 '+s.t+' 开奖';
  var nx='';for(var j=1;j<=7;j++){var x=(d+j)%7;if(s.d.indexOf(x)>=0){nx=j===1?'明天':'周'+WD[x];break}}
  return (i.done?'今日已开奖，':'')+'下次 '+nx}
-function banner(){var n=new Date(),on={},dn=[],e=$('today'),cnt=0;
- ORDER.forEach(function(k){var i=nowInfo(k);if(i.on&&!i.done){(on[SCH[k].t]=on[SCH[k].t]||[]).push(G[k].n);cnt++}else if(i.on)dn.push(G[k].n)});
+function mk(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
+var DSPEC={dlt:[{c:5,a:1,z:35},{c:2,a:1,z:12}],ssq:[{c:6,a:1,z:33},{c:1,a:1,z:16}],qxc:[{c:6,a:0,z:9,d:1},{c:1,a:0,z:14,d:1}],p3:[{c:3,a:0,z:9,d:1}],p5:[{c:5,a:0,z:9,d:1}],kl8:[{c:20,a:1,z:80}]};
+var DHINT={dlt:'05 11 17 25 34 + 04 06',ssq:'04 06 10 15 26 27 + 11',qxc:'294563 + 2',p3:'276',p5:'27624',kl8:'20个号码，空格分隔'};
+var DRW={},DSEL='',DEDIT=false,LASTCUR='';
+try{DRW=JSON.parse(localStorage.getItem('lotto-draw')||'{}')||{}}catch(e){DRW={}}
+function saveD(){try{localStorage.setItem('lotto-draw',JSON.stringify(DRW))}catch(e){toast('浏览器禁止存储')}}
+function todayStr(){var n=new Date();return n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())}
+function parseDraw(k,s){var S=DSPEC[k],segs=s.split(/[+＋|｜]/),out,all;
+ function one(p,t){t=t.trim();return(p.d&&p.c>1&&/^\d+$/.test(t)&&t.length===p.c)?t.split('').map(Number):(t.match(/\d+/g)||[]).map(Number)}
+ if(segs.length===S.length)out=segs.map(function(t,i){return one(S[i],t)});
+ else if(S.length===1)out=[one(S[0],s)];
+ else{all=(s.match(/\d+/g)||[]).map(Number);var o=0;out=S.map(function(p){var a=all.slice(o,o+p.c);o+=p.c;return a})}
+ for(var i=0;i<S.length;i++){var a=out[i]||[];if(a.length!==S[i].c||a.some(function(x){return x<S[i].a||x>S[i].z})||(!S[i].d&&new Set(a).size!==a.length))return null}
+ return out}
+function banner(){var n=new Date(),on={},dn=[],e=$('today'),cnt=0,ts=todayStr();
+ ORDER.forEach(function(k){var i=nowInfo(k);if(i.on&&!i.done){(on[SCH[k].t]=on[SCH[k].t]||[]).push(G[k].n);cnt++}else if(i.on)dn.push(k)});
+ if(LASTCUR!==cur){LASTCUR=cur;if(dn.indexOf(cur)>=0){DSEL=cur;DEDIT=false}}
+ if(dn.indexOf(DSEL)<0){DSEL=dn[0]||'';DEDIT=false}
  var h='<div class="dt"><span class="dd">'+(n.getMonth()+1)+'月'+n.getDate()+'日</span><span class="dw">周'+WD[n.getDay()]+'</span></div>';
- if(!cnt)h+='<div class="tg"><span class="tn">今晚没有开奖的玩法</span></div>';
+ if(!cnt&&!dn.length)h+='<div class="tg"><span class="tn">今晚没有开奖的玩法</span></div>';
  Object.keys(on).sort().forEach(function(t,i){h+='<div class="tg"><span class="tt">'+(i?'':'今晚 ')+t+'</span>'+on[t].map(function(x){return '<span class="chip">'+x+'</span>'}).join('')+'</div>'});
- if(dn.length)h+='<div class="hn">今日已开奖：'+dn.join('、')+'</div>';
- h+='<div class="hn">彩色背景的玩法今晚开奖，购买请留意售票点的停售时间。</div>';
- e.innerHTML=h}
+ e.innerHTML=h;
+ if(dn.length){
+  var r=mk('div','tg');r.appendChild(mk('span','tt','已开奖'));
+  dn.forEach(function(k){var c=mk('button','chip dc'+(k===DSEL?' on':''),G[k].n);c.onclick=function(){DSEL=k;DEDIT=false;banner()};r.appendChild(c)});
+  e.appendChild(r);
+  var man=DRW[DSEL],au=AUTO[DSEL],rec=(man&&man.d===ts)?man:((au&&au.d===ts)?au:null),ok=!!rec,row=mk('div','dn');
+  if(ok&&!DEDIT){
+   rec.n.forEach(function(a,si){if(si>0)row.appendChild(mk('span','dp','+'));a.forEach(function(v){var b=mk('span','hb',pad(v,DSPEC[DSEL][si].d));b.style.background=TH[DSEL][si>0?3:2];row.appendChild(b)})});
+   var ed=mk('button','qk dq','改');ed.onclick=function(){DEDIT=true;banner()};row.appendChild(ed)}
+  else{
+   var inp=mk('input','di'),sv=mk('button','qk','保存');inp.placeholder='输入开奖号码，如 '+DHINT[DSEL];
+   var go=function(){var d=parseDraw(DSEL,inp.value);if(!d){toast('号码个数或范围不对');return}DRW[DSEL]={d:ts,n:d};saveD();DEDIT=false;banner()};
+   sv.onclick=go;inp.onkeydown=function(ev){if(ev.key==='Enter')go()};
+   row.appendChild(inp);row.appendChild(sv);
+   if(ok){var cc=mk('button','qk qa','取消');cc.onclick=function(){DEDIT=false;banner()};row.appendChild(cc)}}
+  e.appendChild(row)}
+ if(cnt)e.appendChild(mk('div','hn','彩色背景的玩法今晚开奖，购买请留意售票点的停售时间。'))}
+var AUTO={},AUTOS='';
+function loadAuto(){try{fetch('draws.json?'+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(j){if(!j||!j.games)return;var t=JSON.stringify(j.games);if(t!==AUTOS){AUTOS=t;AUTO=j.games;banner()}}).catch(function(){})}catch(e){}}
+loadAuto();setInterval(loadAuto,300000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)loadAuto()});
 function loadM(){try{return JSON.parse(localStorage.getItem('lotto-mine')||'{}')}catch(e){return{}}}
 var MINE=loadM();
 function saveM(){try{localStorage.setItem('lotto-mine',JSON.stringify(MINE))}catch(e){toast('浏览器禁止存储，关闭页面后会丢失')}}
