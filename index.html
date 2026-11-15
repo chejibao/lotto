@@ -259,6 +259,11 @@ main{padding-top:10px}
 .tl2{font-size:11px;opacity:.9;margin-right:2px}
 .tn2 .chip{padding:1px 9px;font-size:11.5px}
 .quick{margin-top:8px;padding-top:8px}
+.rs{display:flex;flex-direction:row;align-items:stretch}
+.rcol{flex:1;min-width:0}
+.rl{flex:none;display:flex;align-items:center;justify-content:center;text-align:center;font-size:10.5px;line-height:1.25;padding:0 7px;border-right:1px solid rgba(255,255,255,.2);opacity:.92;letter-spacing:.05em;cursor:pointer}
+.ct{margin-left:4px;font-size:10px;font-weight:400;opacity:.9}
+.tn2 .chip{padding:1px 8px;font-size:11px}
 </style>
 </head>
 <body>
@@ -459,7 +464,7 @@ function parseDraw(k,s){var S=DSPEC[k],segs=s.split(/[+＋|｜]/),out,all;
 var RS=['dlt','ssq'],EDK='';
 function latest(k){var a=AUTO[k],m=DRW[k];if(m&&(!a||m.d>=a.d))return m;return a||null}
 function wk(d){return '周'+WD[new Date(d.replace(/-/g,'/')).getDay()]}
-function banner(){var n=new Date(),e=$('today'),dt=mk('div','dt'),box=mk('div','rs');e.innerHTML='';
+function banner(){var n=new Date(),e=$('today'),dt=mk('div','dt'),box=mk('div','rs'),col=mk('div','rcol');e.innerHTML='';
  dt.appendChild(mk('span','dd',(n.getMonth()+1)+'月'+n.getDate()+'日'));dt.appendChild(mk('span','dw','周'+WD[n.getDay()]));e.appendChild(dt);
  RS.forEach(function(k){var r=latest(k),row=mk('div','rr'+(k===cur?' on':'')),bl=mk('div','rb');
   row.appendChild(mk('span','rn',G[k].n));
@@ -467,8 +472,7 @@ function banner(){var n=new Date(),e=$('today'),dt=mk('div','dt'),box=mk('div','
   if(r&&EDK!==k){
    r.n.forEach(function(a,si){if(si>0)bl.appendChild(mk('i','rd'));a.forEach(function(v){var b=mk('span','hb',pad(v,0));b.style.background=TH[k][si>0?3:2];bl.appendChild(b)})});
    row.appendChild(bl);
-   var m=mk('span','rm');m.appendChild(mk('b','',wk(r.d)));m.appendChild(document.createElement('br'));m.appendChild(document.createTextNode(r.d.slice(5)));
-   m.onclick=function(){EDK=k;banner()};row.appendChild(m)}
+   }
   else{
    var w=mk('div','re'),inp=mk('input','di'),sv=mk('button','qk','保存');inp.placeholder=DHINT[k];
    var go=function(){var d=parseDraw(k,inp.value);if(!d){toast('号码个数或范围不对');return}DRW[k]={d:todayStr(),n:d};saveD();EDK='';banner()};
@@ -476,11 +480,12 @@ function banner(){var n=new Date(),e=$('today'),dt=mk('div','dt'),box=mk('div','
    w.appendChild(inp);w.appendChild(sv);
    if(r){var c=mk('button','qk qa','取消');c.onclick=function(){EDK='';banner()};w.appendChild(c)}
    row.appendChild(w)}
-  box.appendChild(row)});
- e.appendChild(box);
- var on=ORDER.filter(isToday);
+  col.appendChild(row)});
+ var rl=mk('div','rl');rl.innerHTML='上期<br>开奖';rl.onclick=function(){EDK=RS.indexOf(cur)>=0?cur:RS[0];banner()};
+ box.appendChild(rl);box.appendChild(col);e.appendChild(box);
+ var on=ORDER.filter(isToday).sort(function(a,b){return SCH[a].t<SCH[b].t?-1:SCH[a].t>SCH[b].t?1:ORDER.indexOf(a)-ORDER.indexOf(b)});
  if(on.length){var tn=mk('div','tn2');tn.appendChild(mk('span','tl2','今晚'));
-  on.forEach(function(k){var c=mk('button','chip dc'+(k===cur?' on':''),G[k].n);
+  on.forEach(function(k){var c=mk('button','chip dc'+(k===cur?' on':''),G[k].n);c.appendChild(mk('span','ct',SCH[k].t));
    c.onclick=function(){var t=document.querySelectorAll('#tabs .tab')[ORDER.indexOf(k)];if(t)t.click()};tn.appendChild(c)});
   e.appendChild(tn)}}
 setInterval(function(){if(!document.querySelector('#today input'))tabs()},60000);
